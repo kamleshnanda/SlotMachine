@@ -25,7 +25,7 @@ class ViewController: UIViewController {
     var creditsTitleLabel: UILabel!
     var betTitleLabel: UILabel!
     var winnerPaidTitleLabel: UILabel!
-    //var lastSpinResultLabel: UILabel!
+    var resultsLabel: UILabel!
     
     //Buttons in our fourth container
     var resetButton:UIButton!
@@ -39,6 +39,7 @@ class ViewController: UIViewController {
     var credits = 0
     var currentBet = 0
     var winnings = 0
+    var lastResult: String? = "Lets Play"
     
     let kMarginForView:CGFloat = 10.0
     let kMarginForSlot:CGFloat = 2.0
@@ -101,7 +102,10 @@ class ViewController: UIViewController {
         }
         slots = Factory.createSlots()
         setupSecondContainer(self.secondContainer)
-        var winningsMultiplier = SlotBrain.computeWinnings(slots)
+        var winningsMultiplier = SlotBrain.computeWinnings(slots, resultString: &lastResult)
+        if lastResult == nil {
+            lastResult = "No wins, try again"
+        }
         winnings = winningsMultiplier * currentBet
         credits += winnings
         currentBet = 0
@@ -215,13 +219,14 @@ class ViewController: UIViewController {
         self.winnerPaidTitleLabel.center = CGPoint(x: containerView.frame.width * kSixth * 5, y: containerView.frame.height * kThird * 2)
         containerView.addSubview(self.winnerPaidTitleLabel)
         
-//        self.lastSpinResultLabel = UILabel()
-//        self.lastSpinResultLabel.text = ""
-//        self.lastSpinResultLabel.textColor = UIColor.purpleColor()
-//        self.lastSpinResultLabel.font = UIFont(name: "AmericanTypewriter", size: 14)
-//        self.lastSpinResultLabel.sizeToFit()
-//        self.lastSpinResultLabel.center = CGPoint(x: containerView.frame.width * kSixth * 3, y: containerView.frame.height * kThird * 2.6)
-//        containerView.addSubview(self.lastSpinResultLabel)
+        self.resultsLabel = UILabel()
+        self.resultsLabel.text = self.lastResult
+        self.resultsLabel.textColor = UIColor.purpleColor()
+        self.resultsLabel.font = UIFont(name: "AmericanTypewriter", size: 14)
+        self.resultsLabel.textAlignment = NSTextAlignment.Center
+        self.resultsLabel.sizeToFit()
+        self.resultsLabel.center = CGPoint(x: containerView.frame.width * kHalf, y: containerView.frame.height * kThird * 2.6)
+        containerView.addSubview(self.resultsLabel)
     }
     
     func setupFourthContainer(containerView: UIView) {
@@ -291,7 +296,11 @@ class ViewController: UIViewController {
         self.creditsLabel.text = "\(credits)"
         self.betLabel.text = "\(currentBet)"
         self.winnerPaidLabel.text = "\(winnings)"
-        //self.lastSpinResultLabel.text = ""
+        self.resultsLabel.text = lastResult
+        //Center the results label
+        self.resultsLabel.sizeToFit()
+        self.resultsLabel.center = CGPoint(x: self.resultsLabel.superview!.frame.width * kHalf, y: self.resultsLabel.superview!.frame.height * kThird * 2.6)
+        self.lastResult = nil
     }
     
     func showAlertWithText(header: String = "Warning", message: String) {
